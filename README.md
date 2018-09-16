@@ -1,2 +1,2 @@
 # FaraSenseServerless
-Infra estrutura sem servidor do FaraSense na AWS
+Infraestrutura sem servidor do FaraSense na AWS
