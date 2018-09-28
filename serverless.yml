@@ -1,12 +1,13 @@
-service: farasense-api
+service: farasense2-api
 
 frameworkVersion: ">=1.1.0 <2.0.0"
 
 provider:
   name: aws
+  region: us-east-1
   runtime: nodejs6.10
   environment:
-    CURRENT_SENSOR_TABLE: ${self:service}-${opt:stage, self:provider.stage}
+    CURRENT_SENSOR_TABLE: farasenseDb
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -20,66 +21,42 @@ provider:
 
 functions:
   create:
-    handler: current_sensor/create.create
+    handler: create.create
     events:
       - http:
           path: current_sensor
           method: post
           cors: true
 
-  list:
-    handler: current_sensor/list.list
-    events:
-      - http:
-          path: current_sensor
-          method: get
-          cors: true
+  # list:
+  #   handler: current_sensor/list.list
+  #   events:
+  #     - http:
+  #         path: current_sensor
+  #         method: get
+  #         cors: true
 
   get:
-    handler: current_sensor/get.get
+    handler: get.get
     events:
       - http:
-          path: current_sensor/{id}
+          path: current_sensor/{id}/{start}/{end}
           method: get
           cors: true
 
-  update:
-    handler: current_sensor/update.update
-    events:
-      - http:
-          path: current_sensor/{id}
-          method: put
-          cors: true
+  # update:
+  #   handler: current_sensor/update.update
+  #   events:
+  #     - http:
+  #         path: current_sensor/{id}
+  #         method: put
+  #         cors: true
 
-  delete:
-    handler: current_sensor/delete.delete
-    events:
-      - http:
-          path: current_sensor/{id}
-          method: delete
-          cors: true
+  # delete:
+  #   handler: current_sensor/delete.delete
+  #   events:
+  #     - http:
+  #         path: current_sensor/{id}
+  #         method: delete
+  #         cors: true
 
-resources:
-  Resources:
-    CurrentSensorDynamoDbTable:
-      Type: 'AWS::DynamoDB::Table'
-      DeletionPolicy: Retain
-      Properties:
-        AttributeDefinitions:
-          -
-            AttributeName: id
-            AttributeType: S
-            AttributeName: measuredAt
-            AttributeType: N    
-
-        KeySchema:
-          -
-            AttributeName: id
-            KeyType: HASH
-            AttributeName: measuredAt
-            KeyType: RANGE            
-
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        TableName: ${self:provider.environment.CURRENT_SENSOR_TABLE}
