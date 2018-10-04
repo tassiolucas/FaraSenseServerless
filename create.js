@@ -7,14 +7,13 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 module.exports.create = (event, context, callback) => {
   const body = JSON.parse(event.body);
-
+  
   const params = {
     TableName: process.env.CURRENT_SENSOR_TABLE,
     Item: {
       id: body.id,
-      timestamp: new Date(body.timestamp).toISOString(),
+      timestamp: new Date(Date.now()).toISOString(),
       amper: Number(body.amper),
-      milliamper: Number(body.milliamper),
       power: Number(body.power)
     }
   };
