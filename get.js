@@ -7,7 +7,7 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
 module.exports.get = (event, context, callback) => {
 
   const params = {
-    TableName: process.env.CURRENT_SENSOR_TABLE,
+    TableName: process.env.CURRENT_SENSOR_TABLE_MIN,
     KeyConditionExpression: 'id = :ident and #timestamp between :start and :end',
     ExpressionAttributeValues: {
       ':ident': Number(event.pathParameters.id),

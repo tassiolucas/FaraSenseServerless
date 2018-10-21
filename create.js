@@ -9,7 +9,7 @@ module.exports.create = (event, context, callback) => {
   const body = JSON.parse(event.body);
   
   const params = {
-    TableName: process.env.CURRENT_SENSOR_TABLE,
+    TableName: process.env.CURRENT_SENSOR_TABLE_MIN,
     Item: {
       id: body.id,
       timestamp: new Date(Date.now()).toISOString(),

@@ -5,9 +5,11 @@ frameworkVersion: ">=1.1.0 <2.0.0"
 provider:
   name: aws
   region: us-east-1
-  runtime: nodejs6.10
+  runtime: nodejs8.10
   environment:
     CURRENT_SENSOR_TABLE: farasenseDb
+    CURRENT_SENSOR_TABLE_MIN: farasenseDb_min
+    CURRENT_SENSOR_TABLE_HOUR: farasenseDb_hour
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -18,6 +20,24 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.CURRENT_SENSOR_TABLE}"
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.CURRENT_SENSOR_TABLE_MIN}"
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.CURRENT_SENSOR_TABLE_HOUR}"
 
 functions:
   create:
@@ -28,14 +48,6 @@ functions:
           method: post
           cors: true
 
-  # list:
-  #   handler: current_sensor/list.list
-  #   events:
-  #     - http:
-  #         path: current_sensor
-  #         method: get
-  #         cors: true
-
   get:
     handler: get.get
     events:
@@ -44,19 +56,9 @@ functions:
           method: get
           cors: true
 
-  # update:
-  #   handler: current_sensor/update.update
-  #   events:
-  #     - http:
-  #         path: current_sensor/{id}
-  #         method: put
-  #         cors: true
-
-  # delete:
-  #   handler: current_sensor/delete.delete
-  #   events:
-  #     - http:
-  #         path: current_sensor/{id}
-  #         method: delete
-  #         cors: true
-
+  transform:
+    handler: transform.transformMinToHour
+    events:
+      - schedule:
+          rate: rate(1 hour)
+          timezone: America/Sao_Paulo
