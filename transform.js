@@ -8,12 +8,10 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const faraSenseDbMin = process.env.CURRENT_SENSOR_TABLE_MIN;
 const faraSenseDbHour = process.env.CURRENT_SENSOR_TABLE_HOUR;
 const faraSenseSensorId = 1;
+const kilo = 1000;
 
 var startPeriod;
 var endPeriod;
-var mediaPower;
-var kilowattsHour;
-var hour;
 
 module.exports.transformMinToHour = async (event, context, callback) => {
 
@@ -65,7 +63,9 @@ module.exports.transformMinToHour = async (event, context, callback) => {
       var duration = moment.duration(lastMoment.diff(firstMoment));
       var hour = duration.asHours();
   
-      var kilowattsHour = mediaPower * hour;
+      var wattsHour = mediaPower * hour;
+
+      var kilowattsHour = wattsHour / kilo;
       
       console.log('Total Power: ', totalPower, ' Count: ', i, " FirstMoment: ", firstMoment.format(), " LastMoment: ", lastMoment.format(), " Hour: ", hour, " KiloWattsHour:" , kilowattsHour);
       
