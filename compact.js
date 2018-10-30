@@ -5,28 +5,27 @@ const AWS = require('aws-sdk'); // eslint-disable-line import/no-extraneous-depe
 const moment = require('moment');
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
-const faraSenseDbMin = process.env.CURRENT_SENSOR_TABLE_MIN;
 const faraSenseDbHour = process.env.CURRENT_SENSOR_TABLE_HOUR;
+const faraSenseDbDay = process.env.CURRENT_SENSOR_TABLE_DAY;
 const faraSenseSensorId = 1;
-const kilo = 1000;
 
 var startPeriod;
 var endPeriod;
 
-module.exports.transformMinToHour = async (event, context, callback) => {
+module.exports.compactHourToDay = async (event, context, callback) => {
 
   try {
     startPeriod = new Date();
     endPeriod = new Date();
     
-    startPeriod.setHours(startPeriod.getHours() - 1);
-    endPeriod.setHours(endPeriod.getHours() - 1);
+    startPeriod.setHours(startPeriod.getDay() - 1);
+    endPeriod.setHours(endPeriod.getDay() - 1);
     
-    startPeriod.setMinutes(0,0,0,0);
-    endPeriod.setMinutes(59,59,59,59);
+    startPeriod.setHours(0, 0, 0, 0);
+    endPeriod.setHours(59, 59, 59, 59);
     
     const params = {
-      TableName: faraSenseDbMin,
+      TableName: faraSenseDbHour,
       KeyConditionExpression: 'id = :ident and #timestamp between :start and :end',
       ExpressionAttributeValues: {
         ':ident': faraSenseSensorId,
@@ -38,45 +37,38 @@ module.exports.transformMinToHour = async (event, context, callback) => {
       }
     };
     
-    const dataTableMin = await dynamoDb.query(params).promise();       
-    var len = dataTableMin.Items.length;
+    const dataTableHour = await dynamoDb.query(params).promise();       
+    var len = dataTableHour.Items.length;
 
     if (len > 0) {
 
-      var totalPower = 0;
+      var totalKwh = 0;
     
-      console.log('Hora início:', startPeriod.toString(), ' Hora fim:', endPeriod.toString());
+      console.log('Dia início:', startPeriod.toString(), ' Dia fim:', endPeriod.toString());
       
       var i = 0;
       for (i = 0; i < len; i++) {
-        totalPower = totalPower + dataTableMin.Items[i].power;
+        totalKwh = totalKwh + dataTableHour.Items[i].kwh;
         i++;
       }
-      var mediaPower = (totalPower / len);
-  
-      var firstMoment = moment(dataTableMin.Items[0].timestamp);
-      var lastMoment = moment(dataTableMin.Items[len - 1].timestamp);
-      var duration = moment.duration(lastMoment.diff(firstMoment));
-      var hour = duration.asHours();
-  
-      var wattsHour = mediaPower * hour;
-
-      var kilowattsHour = wattsHour / kilo;
       
-      console.log('Total Power: ', totalPower, ' Count: ', i, " FirstMoment: ", firstMoment.format(), " LastMoment: ", lastMoment.format(), " Hour: ", hour, " KiloWattsHour:" , kilowattsHour);
+      var firstMoment = moment(dataTableHour.Items[0].timestamp);
+      var lastMoment = moment(dataTableHour.Items[len - 1].timestamp);
+      var duration = moment.duration(lastMoment.diff(firstMoment));
+      var interval = duration.asHours();
+      
+      console.log(' Total Kwh: ', totalKwh, " FirstMoment: ", firstMoment.format(), " LastMoment: ", lastMoment.format(), " Intervalo: ", interval);
       
       const params2 = {
-          TableName: faraSenseDbHour,
+          TableName: faraSenseDbDay,
           Item: {
             id: faraSenseSensorId,
-            timestamp: firstMoment.toString(),
-            media_power: Number(mediaPower),
-            time: Number(hour),
-            kwh: Number(kilowattsHour)
+            timestamp: startPeriod.toString(),
+            totalKwh: Number(totalKwh)
             }
           };
       
-      const dataTableHour = await dynamoDb.put(params2).promise();
+      const dataTableDay = await dynamoDb.put(params2).promise();
 
       const response = {
         statusCode: 200,

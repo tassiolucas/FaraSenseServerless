@@ -10,6 +10,7 @@ provider:
     CURRENT_SENSOR_TABLE: farasenseDb
     CURRENT_SENSOR_TABLE_MIN: farasenseDb_min
     CURRENT_SENSOR_TABLE_HOUR: farasenseDb_hour
+    CURRENT_SENSOR_TABLE_DAY: farasenseDb_day
     CURRENT_SENSOR_TABLE_BATTERY: farasenseDb_battery
   iamRoleStatements:
     - Effect: Allow
@@ -39,6 +40,15 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.CURRENT_SENSOR_TABLE_HOUR}"
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.CURRENT_SENSOR_TABLE_DAY}"
     - Effect: Allow
       Action:
         - dynamodb:Query
@@ -79,5 +89,12 @@ functions:
     events:
       - schedule:
           rate: cron(0 * * * ? *)
+          timezone: America/Sao_Paulo
+
+  compact:
+    handler: compact.compactHourToDay
+    events:
+      - schedule:
+          rate: cron(0 0 * * ? *)
           timezone: America/Sao_Paulo
 
