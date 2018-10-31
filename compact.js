@@ -18,11 +18,14 @@ module.exports.compactHourToDay = async (event, context, callback) => {
     startPeriod = new Date();
     endPeriod = new Date();
     
-    startPeriod.setHours(startPeriod.getDay() - 1);
-    endPeriod.setHours(endPeriod.getDay() - 1);
+    startPeriod.setDate(startPeriod.getDate() -1);
+    endPeriod.setDate(endPeriod.getDate() - 1);
     
     startPeriod.setHours(0, 0, 0, 0);
-    endPeriod.setHours(59, 59, 59, 59);
+    endPeriod.setHours(23, 59, 59, 999);
+
+    console.log("Start: ", startPeriod);
+    console.log("End: ", endPeriod);
     
     const params = {
       TableName: faraSenseDbHour,
@@ -39,6 +42,8 @@ module.exports.compactHourToDay = async (event, context, callback) => {
     
     const dataTableHour = await dynamoDb.query(params).promise();       
     var len = dataTableHour.Items.length;
+    
+    console.log("ITENS " , dataTableHour.Items);
 
     if (len > 0) {
 

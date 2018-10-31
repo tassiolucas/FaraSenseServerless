@@ -22,8 +22,8 @@ module.exports.transformMinToHour = async (event, context, callback) => {
     startPeriod.setHours(startPeriod.getHours() - 1);
     endPeriod.setHours(endPeriod.getHours() - 1);
     
-    startPeriod.setMinutes(0,0,0,0);
-    endPeriod.setMinutes(59,59,59,59);
+    startPeriod.setMinutes(0, 0, 0);
+    endPeriod.setMinutes(59, 59, 999);
     
     const params = {
       TableName: faraSenseDbMin,
