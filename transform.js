@@ -50,7 +50,7 @@ module.exports.transformMinToHour = async (event, context, callback) => {
       var i = 0;
       for (i = 0; i < len; i++) {
         totalPower = totalPower + dataTableMin.Items[i].power;
-        i++;
+        // console.log('Tp: ', totalPower, ' I: ', dataTableHour.Items[i]);
       }
       var mediaPower = (totalPower / len);
   

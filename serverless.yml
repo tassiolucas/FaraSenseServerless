@@ -74,6 +74,22 @@ functions:
           method: get
           cors: true
 
+  get_hour:
+    handler: get.get_hour
+    events:
+      - http:
+          path: current_sensor/get_hour/{id}/{start}/{end}
+          method: get
+          cors: true
+
+  get_day:
+    handler: get.get_day
+    events:
+      - http:
+          path: current_sensor/get_day/{id}/{start}/{end}
+          method: get
+          cors: true
+
   transform:
     handler: transform.transformMinToHour
     events:

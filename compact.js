@@ -42,19 +42,19 @@ module.exports.compactHourToDay = async (event, context, callback) => {
     
     const dataTableHour = await dynamoDb.query(params).promise();       
     var len = dataTableHour.Items.length;
-    
-    console.log("ITENS " , dataTableHour.Items);
 
     if (len > 0) {
 
-      var totalKwh = 0;
+      var total_kwh = 0;
+      var total_power = 0;
     
       console.log('Dia início:', startPeriod.toString(), ' Dia fim:', endPeriod.toString());
       
       var i = 0;
       for (i = 0; i < len; i++) {
-        totalKwh = totalKwh + dataTableHour.Items[i].kwh;
-        i++;
+        total_kwh = total_kwh + dataTableHour.Items[i].kwh;
+        total_power = total_power + dataTableHour.Items[i].media_power;
+        // console.log('Tk: ', totalKwh, ' I: ', dataTableHour.Items[i]);
       }
       
       var firstMoment = moment(dataTableHour.Items[0].timestamp);
@@ -62,14 +62,15 @@ module.exports.compactHourToDay = async (event, context, callback) => {
       var duration = moment.duration(lastMoment.diff(firstMoment));
       var interval = duration.asHours();
       
-      console.log(' Total Kwh: ', totalKwh, " FirstMoment: ", firstMoment.format(), " LastMoment: ", lastMoment.format(), " Intervalo: ", interval);
+      console.log('Total Kwh: ', total_kwh, ' Total Power: ', total_power,  " FirstMoment: ", firstMoment.format(), " LastMoment: ", lastMoment.format(), " Intervalo: ", interval);
       
       const params2 = {
           TableName: faraSenseDbDay,
           Item: {
             id: faraSenseSensorId,
             timestamp: startPeriod.toISOString(),
-            totalKwh: Number(totalKwh)
+            total_kwh: Number(total_kwh),
+            total_power: Number(total_power)
             }
           };
       
