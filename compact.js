@@ -68,7 +68,7 @@ module.exports.compactHourToDay = async (event, context, callback) => {
           TableName: faraSenseDbDay,
           Item: {
             id: faraSenseSensorId,
-            timestamp: startPeriod.toString(),
+            timestamp: startPeriod.toISOString(),
             totalKwh: Number(totalKwh)
             }
           };

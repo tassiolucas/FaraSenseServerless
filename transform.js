@@ -69,7 +69,7 @@ module.exports.transformMinToHour = async (event, context, callback) => {
           TableName: faraSenseDbHour,
           Item: {
             id: faraSenseSensorId,
-            timestamp: firstMoment.toString(),
+            timestamp: firstMoment.toISOString(),
             media_power: Number(mediaPower),
             time: Number(hour),
             kwh: Number(kilowattsHour)
