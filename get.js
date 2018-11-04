@@ -81,7 +81,7 @@ module.exports.get_hour = (event, context, callback) => {
 module.exports.get_day = (event, context, callback) => {
 
   const params = {
-    TableName: process.env.CURRENT_SENSOR_TABLE_HOUR,
+    TableName: process.env.CURRENT_SENSOR_TABLE_DAY,
     KeyConditionExpression: 'id = :ident and #timestamp between :start and :end',
     ExpressionAttributeValues: {
       ':ident': Number(event.pathParameters.id),
