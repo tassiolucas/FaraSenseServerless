@@ -1,0 +1,25 @@
+{
+  "name": "farasenseserverless",
+  "version": "1.0.0",
+  "main": "compact.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tassiolucas/FaraSenseServerless.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tassiolucas/FaraSenseServerless/issues"
+  },
+  "homepage": "https://github.com/tassiolucas/FaraSenseServerless#readme",
+  "description": "",
+  "dependencies": {
+    "aws-sdk": "^2.437.0",
+    "moment": "^2.24.0",
+    "uuid": "^3.3.2"
+  }
+}

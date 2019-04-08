@@ -57,15 +57,7 @@ functions:
           path: current_sensor
           method: post
           cors: true
-
-  status:
-    handler: status.create
-    events:
-      - http:
-          path: current_sensor/battery
-          method: post
-          cors: true
-
+                
   get:
     handler: get.get
     events:
@@ -90,17 +82,16 @@ functions:
           method: get
           cors: true
 
-  transform:
-    handler: transform.transformMinToHour
+  compact_hour:        
+    handler: compact.minuteToHour
     events:
       - schedule:
           rate: cron(0 * * * ? *)
-          timezone: America/Sao_Paulo
+          timezone: America/Sao_Paulo          
 
-  compact:
-    handler: compact.compactHourToDay
+  compact_day:
+    handler: compact.hourToDay
     events:
       - schedule:
-          rate: cron(0 0 * * ? *)
+          rate: cron(0 3 * * ? *)
           timezone: America/Sao_Paulo
-
